@@ -1,3 +1,5 @@
+import time
+
 def number(n):
     """
     a generator
@@ -18,15 +20,25 @@ def isPrime(ls_primes, n):
     :return: boolean True if n is prime
     """
     prime = True
-    for prime in ls_primes:
+    mid_point = int(n/2)
+    stop_index = 0
+    for i,p in enumerate(ls_primes):
+        if p >= mid_point:
+            stop_index = i
+            break
+
+    for prime in ls_primes[0:stop_index]:
         if n%prime == 0:
             return False
     return True
 
 
 if __name__ == "__main__":
-    i = number(1000)
+    i = number(100000)
     ls_primes = [2]
+
+    start = time.time()
+
     while True:
         try:
             next_i = next(i)
@@ -36,5 +48,6 @@ if __name__ == "__main__":
 
         if isPrime(ls_primes, next_i):
             ls_primes.append(next_i)
-
-    print(ls_primes)
+    end = time.time()
+    duration = end - start
+    print("Total Time taken: {0:.4g} seconds".format(duration))
