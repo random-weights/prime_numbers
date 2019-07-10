@@ -67,9 +67,9 @@ if __name__ == "__main__":
 
     new_prime_queue = Queue()
     ls_primes = [2,3,5,7,11,13,17]
-    for _ in range(1000):
+    for _ in range(1):
         low = ls_primes[-1] + 1
-        high = ls_primes[-1]*2
+        high = ls_primes[-1]**2
 
         mpipei,mpipeo = Pipe()
 
