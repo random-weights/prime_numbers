@@ -6,9 +6,12 @@ import os
 def distributor(ls_feed_pipe_open,low,high):
     def getNumber(low,high):
         i = low
+        if i%2 == 0:
+            i += 1
+
         while i<=high:
             yield i
-            i+=1
+            i+=2
         yield -1
 
     next_pipe = 0
@@ -61,10 +64,11 @@ if __name__ == "__main__":
     new_prime_queue = Queue()
     ls_primes = [2,3,5,7,11,13,17]
     last_checked = ls_primes[-1]
-    for _ in range(1):
+    for _ in range(3):
         low = max(ls_primes[-1]+1,last_checked)
         high = ls_primes[-1]**2
         last_checked = high
+        print("Checking numbers from {0} to {1}".format(low,high))
 
         input_ends = []
         output_ends = []
