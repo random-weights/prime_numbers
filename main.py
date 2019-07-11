@@ -60,9 +60,11 @@ if __name__ == "__main__":
 
     new_prime_queue = Queue()
     ls_primes = [2,3,5,7,11,13,17]
+    last_checked = ls_primes[-1]
     for _ in range(1):
-        low = ls_primes[-1] + 1
+        low = max(ls_primes[-1]+1,last_checked)
         high = ls_primes[-1]**2
+        last_checked = high
 
         input_ends = []
         output_ends = []
