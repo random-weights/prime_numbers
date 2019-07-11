@@ -8,4 +8,5 @@ If we want to find if **n** is a prime number, we have to check divisibility of 
 
 Check divisibility of **17** by all numbers between **2** and **16**.
 >Is it really necessary to check 11,12,13,14,15,16?
+
 >No, you need to check only upto ceil(17/2)

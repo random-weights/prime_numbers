@@ -1,43 +1,38 @@
 import time
-from multiprocessing import Process, Queue, Pipe, Manager
+from multiprocessing import Process, Pipe, Manager
 import os
 
 def getNumber(main_pipe_input,low,high):
-
     print("Feeding batch of numbers from {0} to {1}".format(low,high))
     i = low
     while i<=high:
         main_pipe_input.send(i)
         i += 1
     main_pipe_input.send(-1)
-    print("All numbers from {0} to {1} sent to Distributor".format(low,high))
     return 0
 
 
-def distributor(main_pipe_output,ls_feed_pipe_open):
-    print("Distributing from main pipe to feeders: Round Robin")
+def distributor(main_pipe_output,ls_feed_pipe_input):
     next_pipe = 0
     while True:
         msg = main_pipe_output.recv()
         if msg == -1:
             break
         else:
-            ls_feed_pipe_open[next_pipe].send(msg)
+            ls_feed_pipe_input[next_pipe].send(msg)
             next_pipe += 1
-            if next_pipe == len(ls_feed_pipe_open):
+            if next_pipe == len(ls_feed_pipe_input):
                 next_pipe = 0
-    for p in ls_feed_pipe_open:
+    for p in ls_feed_pipe_input:
         p.send(-1)
-    print("All values distributed")
     return 0
 
 
-def generatePrime(ls_primes, feed_pipe,return_dict):
-    print("Prime Process started")
+def generatePrime(ls_primes, feed_pipe_output,return_dict):
     pcount = 0
     local_primes = []
     while True:
-        n = feed_pipe.recv()
+        n = feed_pipe_output.recv()
         if n == -1:
             break
         else:
@@ -53,7 +48,6 @@ def generatePrime(ls_primes, feed_pipe,return_dict):
             ##if the number is prime, append to global list
             if is_prime:
                 local_primes.append(n)
-    print("Mini-batch processing complete, looked at {0} numbers".format(pcount))
     if len(local_primes) >0:
         return_dict[os.getpid()] = local_primes
         return return_dict
@@ -64,10 +58,8 @@ def generatePrime(ls_primes, feed_pipe,return_dict):
 if __name__ == "__main__":
 
     start = time.time()
-
-    new_prime_queue = Queue()
     ls_primes = [2,3,5,7,11,13,17]
-    for _ in range(1):
+    for _ in range(3):
         low = ls_primes[-1] + 1
         high = ls_primes[-1]**2
 
@@ -109,4 +101,4 @@ if __name__ == "__main__":
     end = time.time()
     duration = end - start
     print("Total Time taken: {0:.4g} seconds".format(duration))
-    print(ls_primes)
+    print(ls_primes[-1])
