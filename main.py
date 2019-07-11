@@ -2,23 +2,19 @@ import time
 from multiprocessing import Process, Queue, Pipe, Manager
 import os
 
-def getNumber(main_pipe_input,low,high):
 
-    print("Feeding batch of numbers from {0} to {1}".format(low,high))
-    i = low
-    while i<=high:
-        main_pipe_input.send(i)
-        i += 1
-    main_pipe_input.send(-1)
-    print("All numbers from {0} to {1} sent to Distributor".format(low,high))
-    return 0
+def distributor(ls_feed_pipe_open,low,high):
+    def getNumber(low,high):
+        i = low
+        while i<=high:
+            yield i
+            i+=1
+        yield -1
 
-
-def distributor(main_pipe_output,ls_feed_pipe_open):
-    print("Distributing from main pipe to feeders: Round Robin")
     next_pipe = 0
+    number = getNumber(low,high)
     while True:
-        msg = main_pipe_output.recv()
+        msg = next(number)
         if msg == -1:
             break
         else:
@@ -28,12 +24,10 @@ def distributor(main_pipe_output,ls_feed_pipe_open):
                 next_pipe = 0
     for p in ls_feed_pipe_open:
         p.send(-1)
-    print("All values distributed")
     return 0
 
 
 def generatePrime(ls_primes, feed_pipe,return_dict):
-    print("Prime Process started")
     pcount = 0
     local_primes = []
     while True:
@@ -53,7 +47,6 @@ def generatePrime(ls_primes, feed_pipe,return_dict):
             ##if the number is prime, append to global list
             if is_prime:
                 local_primes.append(n)
-    print("Mini-batch processing complete, looked at {0} numbers".format(pcount))
     if len(local_primes) >0:
         return_dict[os.getpid()] = local_primes
         return return_dict
@@ -71,17 +64,13 @@ if __name__ == "__main__":
         low = ls_primes[-1] + 1
         high = ls_primes[-1]**2
 
-        mpipei,mpipeo = Pipe()
-
-        i1 = Process(target = getNumber,args=(mpipei,low,high))
-
         input_ends = []
         output_ends = []
         for _ in range(8):
             inp,out = Pipe()
             input_ends.append(inp)
             output_ends.append(out)
-        d1 = Process(target=distributor,args=(mpipeo,input_ends))
+        d1 = Process(target=distributor,args=(input_ends,low,high))
 
         man = Manager()
         return_dict = man.dict()
@@ -89,12 +78,10 @@ if __name__ == "__main__":
         for i in range(8):
             ls_prime_pros.append(Process(target=generatePrime, args=(ls_primes,output_ends[i],return_dict)))
 
-        i1.start()
         d1.start()
         for p in ls_prime_pros:
             p.start()
 
-        i1.join()
         d1.join()
         for p in ls_prime_pros:
             p.join()
