@@ -4,11 +4,6 @@ this algorithm can list out all prime numbers before n.
 
 Run time complexity is yet to be determined. will be updated
 in later commits.
-
-Sieve of Erasto... is not memory efficient to implement.
-It basically lists out all numbers before n, and then crosses them off starting at 3.
-While it works for small n, as n grows larger,
-lot of memory is consumed just for storing n numbers in an array.
 """
 
 import time
