@@ -5,11 +5,11 @@ cross off numbers by making multiple passes over the array.
 
 dont store numbers, instead store only the boolean isPrime
 which by default is set to True for all numbers.
-since the array starts with integer 3, number at any index is i+3 where
+since the array starts with integer 2, number at any index is i+2 where
 i is the index
 """
-import sys
-import math
+import sys,time
+import numpy as np
 
 class Primes:
     def __init__(self,n):
@@ -28,7 +28,7 @@ class Primes:
             self.ls_primes[multiple - 2] = False
             multiple += multiplier
 
-        print("All multiples of {0} crossed off".format(multiplier))
+        #print("All multiples of {0} crossed off".format(multiplier))
 
     def getNextPrime(self):
         index = self.curr_prime - 1
@@ -50,8 +50,11 @@ class Primes:
 
 if __name__ == "__main__":
     n = int(input("Enter the upper bound: "))
+    start = time.time()
     p = Primes(n)
-    for _ in range(1000):
+    while p.curr_prime <= n:
         p.epoch(p.curr_prime)
         p.getNextPrime()
-    print(p.getMaxPrime())
+    print(p.curr_prime)
+    end = time.time()
+    print("Total time taken: {0:.4g}".format(end-start))
