@@ -15,7 +15,7 @@ class Primes:
     def __init__(self,n):
         if n <= sys.maxsize:
             try:
-                self.ls_primes = [True]*n
+                self.ls_primes = np.ones((n),dtype = bool)
                 print("Array of booleans created")
             except Exception as e:
                 print(e)
